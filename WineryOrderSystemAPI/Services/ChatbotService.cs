@@ -163,9 +163,8 @@ namespace WineryOrderSystemAPI.Services
             var retryPolicy = Policy
                 .HandleResult<HttpResponseMessage>(r => (int)r.StatusCode == 503 || (int)r.StatusCode >= 500)
                 .WaitAndRetryAsync(
-                    retryCount: 3,
-                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt))
-                                                    + TimeSpan.FromMilliseconds(new Random().Next(0, 500))
+                    retryCount: 1,
+                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(2)
                 );
 
             // 4. Active Multi-Model Fallback Chain

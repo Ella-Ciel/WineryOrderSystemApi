@@ -14,6 +14,11 @@ builder.Services.AddDbContext<WineryReadDbContext>(options =>
 builder.Services.AddHttpClient<IChatbotService, ChatbotService>();
 builder.Services.AddScoped<IChatbotService, ChatbotService>();
 
+builder.Services.AddHttpClient<IChatbotService, ChatbotService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(60);
+});
+
 builder.Services.AddAutoMapper(typeof(WineryOrderSystemAPI.Mappings.MappingProfile));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
