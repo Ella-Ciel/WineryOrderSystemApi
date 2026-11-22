@@ -84,10 +84,10 @@ public partial class WineryDbContext : DbContext
                 .HasForeignKey(d => d.CartId)
                 .HasConstraintName("FK_CartItems_Carts");
 
-            //entity.HasOne(d => d.Product).WithMany(p => p.CartItems)
-            //    .HasForeignKey(d => d.ProductId)
-            //    .OnDelete(DeleteBehavior.ClientSetNull)
-            //    .HasConstraintName("FK_CartItems_Wines");
+            entity.HasOne(d => d.Wine).WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CartItems_Wines");
         });
         
         modelBuilder.Entity<ChatMessage>(entity =>
