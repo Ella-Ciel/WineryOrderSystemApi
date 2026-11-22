@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WineryOrderSystemAPI.Models;
+﻿namespace WineryOrderSystemAPI.Models;
 
 public partial class Order
 {
@@ -16,6 +13,8 @@ public partial class Order
     public string Status { get; set; } = null!;
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual User User { get; set; } = null!;
 }

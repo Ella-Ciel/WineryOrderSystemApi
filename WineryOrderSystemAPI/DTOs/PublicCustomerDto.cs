@@ -1,6 +1,6 @@
 ﻿namespace WineryOrderSystemAPI.DTOs
 {
-    public class PublicCostumerDto
+    public class PublicCustomerDto
     {
         public string FullName { get; set; } = null!;
         public string? Phone { get; set; }

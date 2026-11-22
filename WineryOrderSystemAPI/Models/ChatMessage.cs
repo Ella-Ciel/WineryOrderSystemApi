@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WineryOrderSystemAPI.Models;
+﻿namespace WineryOrderSystemAPI.Models;
 
 public partial class ChatMessage
 {

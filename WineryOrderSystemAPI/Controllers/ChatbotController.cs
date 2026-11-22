@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WineryOrderSystemAPI.Data;
 using WineryOrderSystemAPI.DTOs;
@@ -13,11 +14,13 @@ namespace WineryOrderSystemAPI.Controllers
     {
         private readonly IChatbotService _chatbotService;
         private readonly WineryDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ChatbotController(IChatbotService chatbotService, WineryDbContext context)
+        public ChatbotController(IChatbotService chatbotService, WineryDbContext context, IMapper mapper)
         {
             _chatbotService = chatbotService;
             _context = context;
+            _mapper = mapper;
         }
 
         // Send message to Chatbot
@@ -54,11 +57,7 @@ namespace WineryOrderSystemAPI.Controllers
         [HttpPost("faqs/add")]
         public async Task<IActionResult> AddFaq([FromBody] FaqCreateDto dto)
         {
-            var faq = new Faq
-            {
-                Question = dto.Question,
-                Answer = dto.Answer
-            };
+            var faq = _mapper.Map<Faq>(dto);
 
             _context.Faqs.Add(faq);
             await _context.SaveChangesAsync();

@@ -2,7 +2,7 @@
 {
     public class CheckoutDto
     {
-        public int CostumerId { get; set; }
+        public int UserId { get; set; }
         public List<CreateOrderItemDto> Items { get; set; } = new();
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WineryOrderSystemAPI.Models;
+﻿namespace WineryOrderSystemAPI.Models;
 
 public partial class Wine
 {
@@ -18,6 +15,8 @@ public partial class Wine
     public string? Category { get; set; }
 
     public DateTime? CreatedAt { get; set; }
+
+    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

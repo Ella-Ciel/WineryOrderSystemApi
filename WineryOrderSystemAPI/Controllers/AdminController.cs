@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WineryOrderSystemAPI.Data;
@@ -10,6 +11,7 @@ namespace WineryOrderSystemAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly WineryDbContext _context;
@@ -23,10 +25,10 @@ namespace WineryOrderSystemAPI.Controllers
 
         // GET: api/admin/customers (See all customers with their ID)
         [HttpGet("customers")]
-        public async Task<ActionResult<IEnumerable<AdminCostumerDto>>> GetAllCustomers()
+        public async Task<ActionResult<IEnumerable<AdminCustomerDto>>> GetAllCustomers()
         {
             var customers = await _context.Users
-                .ProjectTo<AdminCostumerDto>(_mapper.ConfigurationProvider)
+                .ProjectTo<AdminCustomerDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return Ok(customers);

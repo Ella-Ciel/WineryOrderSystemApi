@@ -14,10 +14,10 @@ namespace WineryOrderSystemAPI.Mappings
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
             //Customer / User Mappings
-            CreateMap<User, PublicCostumerDto>();
-            CreateMap<User, AdminCostumerDto>()
+            CreateMap<User, PublicCustomerDto>();
+            CreateMap<User, AdminCustomerDto>()
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role != null ? src.Role.RoleName : string.Empty));
-            CreateMap<RegisterCostumerDto, User>()
+            CreateMap<RegisterDto, User>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
 
             // Order Mapping
@@ -36,7 +36,7 @@ namespace WineryOrderSystemAPI.Mappings
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems));
 
             // Order line item detail mapping
-            CreateMap<OrderItem, OrderItemDetailDto>()
+            CreateMap<OrderItem, OrderItemReadDto>()
                 .ForMember(dest => dest.WineName, opt => opt.MapFrom(src => src.Product != null ? src.Product.WineName : string.Empty));
         }
     }

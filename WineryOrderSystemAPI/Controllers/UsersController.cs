@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WineryOrderSystemAPI.Data;
@@ -8,6 +9,7 @@ using WineryOrderSystemAPI.Models;
 
 namespace WineryOrderSystemAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -23,10 +25,10 @@ namespace WineryOrderSystemAPI.Controllers
 
         // GET: api/users/public (Check all registered person without ID/confidential info)
         [HttpGet("public")]
-        public async Task<ActionResult<IEnumerable<PublicCostumerDto>>> GetPublicUserList()
+        public async Task<ActionResult<IEnumerable<PublicCustomerDto>>> GetPublicUserList()
         {
             var publicList = await _context.Users
-                .ProjectTo<PublicCostumerDto>(_mapper.ConfigurationProvider)
+                .ProjectTo<PublicCustomerDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return Ok(publicList);
@@ -46,7 +48,7 @@ namespace WineryOrderSystemAPI.Controllers
 
         // PUT: api/users/5/details (Edit personal details separately)
         [HttpPut("{costumerId}/details")]
-        public async Task<IActionResult> UpdatePersonalDetails(int costumerId, [FromBody] UpdateCostumerDetailsDto dto)
+        public async Task<IActionResult> UpdatePersonalDetails(int costumerId, [FromBody] UpdateCustomerDetailsDto dto)
         {
             var costumer = await _context.Users.FindAsync(costumerId);
             if (costumer == null) return NotFound("Customer record not found.");
@@ -110,7 +112,7 @@ namespace WineryOrderSystemAPI.Controllers
         [HttpPost("checkout")]
         public async Task<IActionResult> Checkout([FromBody] CheckoutDto dto)
         {
-            var costumer = await _context.Users.FindAsync(dto.CostumerId);
+            var costumer = await _context.Users.FindAsync(dto.UserId);
             if (costumer == null) return NotFound("Customer ID not found.");
 
             if (dto.Items == null || !dto.Items.Any())
@@ -141,7 +143,7 @@ namespace WineryOrderSystemAPI.Controllers
 
             var order = new Order
             {
-                UserId = dto.CostumerId,
+                UserId = dto.UserId,
                 OrderDate = DateTime.Now,
                 TotalAmount = totalAmount,
                 Status = "Pending",

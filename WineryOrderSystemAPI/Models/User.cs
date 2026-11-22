@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WineryOrderSystemAPI.Models;
+﻿namespace WineryOrderSystemAPI.Models;
 
 public partial class User
 {
@@ -22,6 +19,8 @@ public partial class User
     public string PasswordHash { get; set; } = null!;
 
     public string PasswordSalt { get; set; } = null!;
+
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual ICollection<ChatSession> ChatSessions { get; set; } = new List<ChatSession>();
 

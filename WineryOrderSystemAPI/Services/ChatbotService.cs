@@ -132,7 +132,7 @@ namespace WineryOrderSystemAPI.Services
                                    $"Available Catalog & Stock:\n- {string.Join("\n- ", winesSummary)}\n" +
                                    $"Top Revenue Wines (Analytics):\n- {string.Join("\n- ", topSalesSummary)}\n";
 
-            // 2. Structured JSON Payload with explicit systemInstruction
+            // 2. Stricter system instruction — only answer system-related questions
             var requestBody = new
             {
                 systemInstruction = new
@@ -141,8 +141,11 @@ namespace WineryOrderSystemAPI.Services
                     {
                         new
                         {
-                            text = "You are an intelligent virtual assistant for 'Winery Order System'. " +
-                                   "Use the provided SYSTEM DATA CONTEXT to give precise, polite, and concise answers regarding prices, stock, top sellers, and recommendations.\n\n" +
+                            text = "You are a virtual assistant for the 'Winery Order System'. " +
+                                   "You MUST only answer questions related to this winery system (wines, prices, stock, orders, payments, delivery, FAQs). " +
+                                   "If the question is unrelated to the system, reply only with: " +
+                                   "'I'm sorry, I can only help with questions about the Winery Order System.' " +
+                                   "Use the SYSTEM DATA CONTEXT below for relevant answers.\n\n" +
                                    systemContext
                         }
                     }
@@ -159,7 +162,7 @@ namespace WineryOrderSystemAPI.Services
                 }
             };
 
-            // 3. Define Polly Resilience Strategy (Retry on 503 Service Unavailable / 5xx with Exponential Backoff + Jitter)
+            // 3. Polly retry policy
             var retryPolicy = Policy
                 .HandleResult<HttpResponseMessage>(r => (int)r.StatusCode == 503 || (int)r.StatusCode >= 500)
                 .WaitAndRetryAsync(
@@ -167,7 +170,7 @@ namespace WineryOrderSystemAPI.Services
                     sleepDurationProvider: attempt => TimeSpan.FromSeconds(2)
                 );
 
-            // 4. Active Multi-Model Fallback Chain
+            // 4. Multi-model fallback
             string[] candidateModels = { "gemini-3.8-flash", "gemini-3.5-flash-lite" };
             string lastRawError = string.Empty;
 

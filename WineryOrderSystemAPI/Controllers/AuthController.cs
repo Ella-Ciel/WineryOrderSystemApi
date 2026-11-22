@@ -1,94 +1,75 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 using WineryOrderSystemAPI.Data;
-using WineryOrderSystemAPI.DTOs.WineryOrderSystemAPI.DTOs;
+using WineryOrderSystemAPI.DTOs;
 using WineryOrderSystemAPI.Models;
+using WineryOrderSystemAPI.Services;
 
 namespace WineryOrderSystemAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/v1/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly WineryDbContext _context;
+        private readonly TokenService _tokenService;
+        private readonly IMapper _mapper;
 
-        public AuthController(WineryDbContext context)
+        public AuthController(WineryDbContext context, TokenService tokenService, IMapper mapper)
         {
             _context = context;
+            _tokenService = tokenService;
+            _mapper = mapper;
         }
 
+        // POST: api/v1/Auth/register
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserRegisterDto request)
+        public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterDto dto)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-                return BadRequest("Email address is already in use.");
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+                return BadRequest("Email already registered.");
 
-            CreatePasswordHash(request.Password, out string passwordHash, out string passwordSalt);
+            var (hash, salt) = PasswordHelper.HashPassword(dto.Password);
 
             var user = new User
             {
-                FullName = request.FullName,
-                Email = request.Email,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-                Phone = request.Phone,
-                Address = request.Address,
-                RoleId = 2 // System default set to 2 (Standard Customer)
+                FullName = dto.FullName,
+                Email = dto.Email,
+                Phone = dto.Phone,
+                Address = dto.Address,
+                PasswordHash = hash,
+                PasswordSalt = salt,
+                RoleId = 2,
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "Registration successful." });
+            await _context.Entry(user).Reference(u => u.Role).LoadAsync();
+
+            var response = _mapper.Map<AuthResponseDto>(user);
+            response.Token = _tokenService.GenerateToken(user);
+
+            return Ok(response);
         }
 
-        [HttpPost("user-login")]
-        public async Task<IActionResult> UserLogin(UserLoginDto request)
+        // POST: api/v1/Auth/login
+        [HttpPost("login")]
+        public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto dto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
-            if (user == null || !VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            if (user == null || !PasswordHelper.VerifyPassword(dto.Password, user.PasswordHash, user.PasswordSalt))
                 return Unauthorized("Invalid email or password.");
 
-            if (user.RoleId == 1)
-                return Unauthorized("Administrators must log in using the Admin Portal.");
+            var response = _mapper.Map<AuthResponseDto>(user);
+            response.Token = _tokenService.GenerateToken(user);
 
-            return Ok(new { Message = "User authentication successful.", UserId = user.UserId, RoleId = user.RoleId });
-        }
-
-        [HttpPost("admin-login")]
-        public async Task<IActionResult> AdminLogin(UserLoginDto request)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-
-            if (user == null || !VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
-                return Unauthorized("Invalid email or password.");
-
-            if (user.RoleId != 1)
-                return Unauthorized("Access denied. Administrator rights required.");
-
-            return Ok(new { Message = "Admin authentication successful.", UserId = user.UserId, RoleId = user.RoleId });
-        }
-
-        private void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = Convert.ToBase64String(hmac.Key);
-                passwordHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
-            }
-        }
-
-        private bool VerifyPasswordHash(string password, string storedHash, string storedSalt)
-        {
-            var saltBytes = Convert.FromBase64String(storedSalt);
-            using (var hmac = new HMACSHA512(saltBytes))
-            {
-                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(computedHash) == storedHash;
-            }
+            return Ok(response);
         }
     }
 }
