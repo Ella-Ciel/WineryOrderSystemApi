@@ -1,0 +1,399 @@
+/* ============================================================
+   FIGMA-ACCURATE ADMIN BENTO LAYOUT + CELLAR THEME
+   ============================================================ */
+.admin-shell {
+  min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: 255px 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.admin-mobile-bar {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-cream);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+/* LEFT CRIMSON COLUMN */
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-nav-card {
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, #521420 0%, var(--crimson) 100%);
+  color: var(--text-light);
+  border-radius: 6px;
+  padding: 20px 18px 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-brand-head h2 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0.6px;
+}
+.admin-nav-divider { border: none; border-top: 1px solid rgba(242, 244, 243, 0.35); margin: 2px 0 6px; }
+
+.admin-nav-list { display: flex; flex-direction: column; gap: 6px; }
+
+.admin-nav-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: rgba(242, 244, 243, 0.86);
+  padding: 9px 6px 14px;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+  transition: color 0.18s, transform 0.16s;
+}
+.admin-nav-btn:hover { color: var(--accent-light); transform: translateX(3px); }
+.admin-nav-btn.active { color: var(--accent-light); font-weight: 700; }
+
+/* Figma Arrow Underline Indicator */
+.admin-nav-btn .active-arrow {
+  position: absolute;
+  left: 2px;
+  right: 14px;
+  bottom: 3px;
+  height: 1.5px;
+  background: rgba(242, 244, 243, 0.85);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.admin-nav-btn .active-arrow::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -3.5px;
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid rgba(242, 244, 243, 0.85);
+  border-right: 1.5px solid rgba(242, 244, 243, 0.85);
+  transform: rotate(45deg);
+}
+.admin-nav-btn.active .active-arrow { transform: scaleX(1); }
+
+.bottle-bullet { display: inline-flex; color: currentColor; flex-shrink: 0; }
+
+.admin-nav-footer {
+  margin-top: 6px;
+  border-top: 1px solid rgba(242, 244, 243, 0.18);
+  padding-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.admin-sub-btn {
+  background: rgba(37, 36, 34, 0.35);
+  color: var(--text-light);
+  border: 1px solid rgba(169, 146, 125, 0.32);
+  border-radius: 6px;
+  padding: 7px 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  transition: background 0.18s;
+}
+.admin-sub-btn:hover { background: rgba(255, 252, 242, 0.14); }
+
+/* CRIMSON BENTO TILES */
+.figma-tile {
+  background: linear-gradient(155deg, #521420 0%, var(--crimson) 68%, #3A0C15 100%);
+  color: var(--text-light);
+  border-radius: 6px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(169, 146, 125, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeSlideUp 0.42s ease both;
+}
+
+.side-tile {
+  cursor: pointer;
+  justify-content: space-between;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.side-tile:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(73, 17, 28, 0.28); }
+
+/* Middle sidebar card stretches so its bottom aligns with Pending Orders & Analytics */
+.admin-sidebar > .side-tile:first-of-type {
+  flex: 1 1 auto;
+  min-height: 130px;
+}
+
+/* Bottom sidebar card matches the exact height of Completed / Recent / Low-Stock */
+#sideTileTotalOrders,
+#sideTileLowStock {
+  flex: 0 0 200px;
+  height: 200px;
+}
+
+.clickable-tile { cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+.clickable-tile:hover { transform: translateY(-2px); border-color: var(--accent-light); }
+
+.tile-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--text-light);
+}
+.tile-sub { display: block; font-size: 0.74rem; color: var(--accent-light); }
+.tile-header-split { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.tile-body-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+.tile-num { font-family: var(--font-serif); font-size: 2.35rem; line-height: 1; color: var(--text-light); }
+.tile-num-lg { font-family: var(--font-serif); font-size: 2.6rem; line-height: 1; color: var(--accent-light); }
+.tile-money { display: block; font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: var(--accent-light); margin-top: 2px; }
+.engraved-icon { color: rgba(242, 244, 243, 0.78); flex-shrink: 0; }
+
+/* MAIN WORKSPACE */
+.admin-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.admin-tab { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+
+.admin-page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.admin-page-head h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--text-dark);
+}
+.admin-page-head p { color: var(--accent-dark); font-size: 0.88rem; margin-top: 2px; }
+.admin-corner-brand { font-family: var(--font-serif); font-size: 1.3rem; color: var(--crimson); font-weight: 600; }
+
+/* FIGMA MIDDLE ROW: Pending Orders (Left Tall) + Inventory Summary / Analytics (Right Wide) */
+.figma-mid-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.95fr;
+  gap: 16px;
+}
+.tall-tile,
+.wide-tile {
+  height: 355px;
+}
+
+/* Chart Mode Switcher inside Crimson Inventory Summary */
+.chart-toggle-group {
+  display: inline-flex;
+  background: rgba(37, 36, 34, 0.45);
+  border: 1px solid rgba(169, 146, 125, 0.35);
+  border-radius: 999px;
+  padding: 2px;
+}
+.chart-tab-btn {
+  background: transparent;
+  border: none;
+  color: rgba(242, 244, 243, 0.75);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  transition: background 0.18s, color 0.18s;
+}
+.chart-tab-btn.active { background: var(--accent-light); color: var(--text-dark); }
+
+.crimson-chart-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: rgba(26, 5, 10, 0.32);
+  border: 1px solid rgba(169, 146, 125, 0.18);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+/* FIGMA BOTTOM ROW: Completed Orders + Recent Orders + Low-Stock Alerts */
+.figma-bottom-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.25fr 1.15fr;
+  gap: 16px;
+}
+.bottom-tile {
+  height: 200px;
+}
+.bottom-tile .tile-header-split { align-items: center; }
+
+.tile-stat-detail { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(169, 146, 125, 0.22); }
+
+/* COMPACT INTERNAL SCROLL FEEDS (Hidden Scrollbar, Still Scrollable) */
+.tile-scroll-feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-right: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tile-scroll-feed::-webkit-scrollbar { display: none; }
+
+.mini-feed-row {
+  background: rgba(26, 5, 10, 0.38);
+  border: 1px solid rgba(169, 146, 125, 0.2);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  transition: background 0.15s;
+}
+.mini-feed-row:hover { background: rgba(26, 5, 10, 0.6); }
+.mini-feed-row strong { display: block; color: var(--text-light); font-size: 0.8rem; }
+.mini-feed-row small { color: var(--accent-light); font-size: 0.7rem; }
+
+.pill-sand {
+  background: var(--accent-light);
+  color: var(--text-dark);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* TOOLBAR & CRIMSON LEDGER CONTAINER (INVENTORY & ORDERS) */
+.admin-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.admin-search-input {
+  flex: 1;
+  min-width: 220px;
+  max-width: 420px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--accent-dark);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-dark);
+  font-size: 0.88rem;
+}
+.admin-select-input {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-dark);
+  font-size: 0.86rem;
+}
+
+.crimson-ledger-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--crimson);
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(169, 146, 125, 0.3);
+}
+
+.ledger-scroll {
+  max-height: calc(100vh - 235px);
+  min-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ledger-scroll::-webkit-scrollbar { display: none; }
+
+.ledger-table { width: 100%; border-collapse: collapse; color: var(--text-light); font-size: 0.84rem; }
+.ledger-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #340B13;
+  color: var(--accent-light);
+  text-align: left;
+  padding: 11px 14px;
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ledger-table td {
+  padding: 10px 14px;
+  border-top: 1px solid rgba(169, 146, 125, 0.18);
+  vertical-align: middle;
+}
+.ledger-table tbody tr { transition: background 0.15s; }
+.ledger-table tbody tr:hover { background: rgba(255, 252, 242, 0.06); }
+
+.inv-thumb {
+  width: 40px;
+  height: 50px;
+  background: var(--bg-cream);
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--accent-light);
+}
+.inv-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.inline-status-select {
+  padding: 5px 8px;
+  border: 1px solid var(--accent-light);
+  border-radius: 6px;
+  background: #252422;
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.action-btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* RESPONSIVE */
+@media (max-width: 1180px) {
+  .figma-mid-grid { grid-template-columns: 1fr; }
+  .tall-tile, .wide-tile, .bottom-tile,
+  #sideTileTotalOrders, #sideTileLowStock {
+    height: auto;
+    flex: none;
+  }
+  .tall-tile, .wide-tile { min-height: 310px; }
+  .crimson-chart-wrap { min-height: 240px; }
+  .bottom-tile { min-height: 180px; }
+  .figma-bottom-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 900px) {
+  .admin-shell { grid-template-columns: 1fr; padding: 0 0 40px; gap: 0; }
+  .admin-mobile-bar { display: flex; position: sticky; top: 0; z-index: 45; }
+  .admin-sidebar { display: none; padding: 14px; }
+  .admin-sidebar.open { display: flex; }
+  .admin-main { padding: 18px 14px; }
+  .figma-bottom-grid { grid-template-columns: 1fr; }
+}

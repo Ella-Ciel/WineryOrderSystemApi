@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WineryOrderSystemAPI.Data;
 using WineryOrderSystemAPI.DTOs;
 using WineryOrderSystemAPI.Models;
@@ -23,7 +24,6 @@ namespace WineryOrderSystemAPI.Controllers
         }
 
         // GET: api/v1/Orders/{id}
-        // Get a single order by OrderId
         [HttpGet("{id:int}")]
         public async Task<ActionResult<OrderReadDto>> GetOrder(int id)
         {
@@ -40,7 +40,6 @@ namespace WineryOrderSystemAPI.Controllers
         }
 
         // GET: api/v1/Orders/user/{userId}
-        // Get all orders for a specific user
         [HttpGet("user/{userId:int}")]
         public async Task<ActionResult<IEnumerable<OrderReadDto>>> GetOrdersByUser(int userId)
         {
@@ -55,8 +54,25 @@ namespace WineryOrderSystemAPI.Controllers
             return Ok(_mapper.Map<List<OrderReadDto>>(orders));
         }
 
+        // GET: api/v1/Orders/my-orders
+        // Convenience endpoint that uses the logged-in user
+        [HttpGet("my-orders")]
+        public async Task<ActionResult<IEnumerable<OrderReadDto>>> GetMyOrders()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var orders = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+
+            return Ok(_mapper.Map<List<OrderReadDto>>(orders));
+        }
+
         // POST: api/v1/Orders/checkout
-        // Create an order from the user's cart (checkout)
         [HttpPost("checkout")]
         public async Task<ActionResult<OrderReadDto>> Checkout([FromBody] CheckoutDto dto)
         {
@@ -116,7 +132,6 @@ namespace WineryOrderSystemAPI.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                // Reload with navigation properties for mapping
                 await _context.Entry(order).Reference(o => o.User).LoadAsync();
                 await _context.Entry(order)
                     .Collection(o => o.OrderItems)
@@ -133,8 +148,36 @@ namespace WineryOrderSystemAPI.Controllers
             }
         }
 
+        // POST: api/v1/Orders/{id}/cancel
+        // Cancel a pending order and restore stock
+        [HttpPost("{id:int}/cancel")]
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+
+            if (order == null)
+                return NotFound("Order not found.");
+
+            if (order.Status != "Pending")
+                return BadRequest("Only pending orders can be cancelled.");
+
+            order.Status = "Cancelled";
+
+            // Restore stock
+            foreach (var item in order.OrderItems)
+            {
+                var wine = await _context.Wines.FindAsync(item.ProductId);
+                if (wine != null)
+                    wine.StockQuantity += item.Quantity;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Order cancelled and stock restored." });
+        }
+
         // PUT: api/v1/Orders/{id}/status
-        // Update the status of an order
         [HttpPut("{id:int}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
         {

@@ -45,6 +45,26 @@ namespace WineryOrderSystemAPI.Controllers
             return Ok(orders);
         }
 
+        // GET: api/admin/dashboard/metrics
+        [HttpGet("dashboard/metrics")]
+        public async Task<IActionResult> GetDashboardMetrics()
+        {
+            var totalWines = await _context.Wines.CountAsync();
+            var totalOrders = await _context.Orders.CountAsync();
+            var pendingOrders = await _context.Orders.CountAsync(o => o.Status == "Pending");
+            var completedOrders = await _context.Orders.CountAsync(o => o.Status == "Completed");
+            var lowStock = await _context.Wines.CountAsync(w => w.StockQuantity < 10);
+
+            return Ok(new
+            {
+                totalWines,
+                totalOrders,
+                pendingOrders,
+                completedOrders,
+                lowStock
+            });
+        }
+
         // GET: api/admin/orders/5 (Admin view: view specific order with full info)
         [HttpGet("orders/{id}")]
         public async Task<ActionResult<AdminOrderDto>> GetOrderById(int id)

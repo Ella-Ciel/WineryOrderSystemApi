@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Polly;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using WineryOrderSystemAPI.Data;
@@ -67,7 +68,7 @@ namespace WineryOrderSystemAPI.Services
             else
             {
                 // 4. Live External AI Fallback with System Data Context
-                replyText = await FetchLiveGeminiResponseAsync(request.Prompt);
+                replyText = await FetchLiveGrokResponseAsync(request.Prompt);
             }
 
             // 5. Save AI Bot Response
@@ -101,13 +102,15 @@ namespace WineryOrderSystemAPI.Services
             return session;
         }
 
-        private async Task<string> FetchLiveGeminiResponseAsync(string userPrompt)
+        private async Task<string> FetchLiveGrokResponseAsync(string userPrompt)
         {
-            var apiKey = _configuration["Gemini:ApiKey"];
-            if (string.IsNullOrEmpty(apiKey))
+            var apiKey = _configuration["Grok:ApiKey"];
+            if (string.IsNullOrWhiteSpace(apiKey))
             {
                 return "AI key is missing in appsettings.json.";
             }
+
+            var requestUrl = _configuration["Grok:BaseUrl"] ?? "https://api.x.ai/v1/chat/completions";
 
             // 1. Gather System Context concurrently with non-tracking queries
             var winesTask = _primaryContext.Wines
@@ -132,61 +135,51 @@ namespace WineryOrderSystemAPI.Services
                                    $"Available Catalog & Stock:\n- {string.Join("\n- ", winesSummary)}\n" +
                                    $"Top Revenue Wines (Analytics):\n- {string.Join("\n- ", topSalesSummary)}\n";
 
-            // 2. Stricter system instruction — only answer system-related questions
-            var requestBody = new
-            {
-                systemInstruction = new
-                {
-                    parts = new[]
-                    {
-                        new
-                        {
-                            text = "You are a virtual assistant for the 'Winery Order System'. " +
-                                   "You MUST only answer questions related to this winery system (wines, prices, stock, orders, payments, delivery, FAQs). " +
-                                   "If the question is unrelated to the system, reply only with: " +
-                                   "'I'm sorry, I can only help with questions about the Winery Order System.' " +
-                                   "Use the SYSTEM DATA CONTEXT below for relevant answers.\n\n" +
-                                   systemContext
-                        }
-                    }
-                },
-                contents = new[]
-                {
-                    new
-                    {
-                        parts = new[]
-                        {
-                            new { text = userPrompt }
-                        }
-                    }
-                }
-            };
+            string fullSystemPrompt = "You are a virtual assistant for the 'Winery Order System'. " +
+                                      "You MUST only answer questions related to this winery system (wines, prices, stock, orders, payments, delivery, FAQs). " +
+                                      "If the question is unrelated to the system, reply only with: " +
+                                      "'I'm sorry, I can only help with questions about the Winery Order System.' " +
+                                      "Use the SYSTEM DATA CONTEXT below for relevant answers.\n\n" +
+                                      systemContext;
 
-            // 3. Polly retry policy
+            // 2. Polly retry policy for 429 rate limits or 5xx transient server errors
             var retryPolicy = Policy
-                .HandleResult<HttpResponseMessage>(r => (int)r.StatusCode == 503 || (int)r.StatusCode >= 500)
+                .HandleResult<HttpResponseMessage>(r => (int)r.StatusCode == 429 || (int)r.StatusCode >= 500)
                 .WaitAndRetryAsync(
                     retryCount: 1,
                     sleepDurationProvider: attempt => TimeSpan.FromSeconds(2)
                 );
 
-            // 4. Multi-model fallback
-            string[] candidateModels = { "gemini-3.8-flash", "gemini-3.5-flash-lite" };
-            string lastRawError = string.Empty;
+            // 3. Multi-model fallback using Grok models from appsettings.json (with defaults)
+            var candidateModels = _configuration.GetSection("Grok:Models").Get<string[]>()
+                                  ?? new[] { "grok-3-mini", "grok-3" };
 
+            string lastRawError = string.Empty;
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
 
             foreach (var model in candidateModels)
             {
-                var requestUrl = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
+                var requestBody = new
+                {
+                    model = model,
+                    messages = new[]
+                    {
+                        new { role = "system", content = fullSystemPrompt },
+                        new { role = "user", content = userPrompt }
+                    },
+                    temperature = 0.3
+                };
 
                 try
                 {
                     var response = await retryPolicy.ExecuteAsync(async () =>
                     {
                         var jsonPayload = JsonSerializer.Serialize(requestBody);
-                        var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                        return await _httpClient.PostAsync(requestUrl, content);
+                        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+                        httpRequest.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                        return await _httpClient.SendAsync(httpRequest);
                     });
 
                     if (response.IsSuccessStatusCode)
@@ -195,10 +188,9 @@ namespace WineryOrderSystemAPI.Services
                         using var doc = JsonDocument.Parse(jsonResponse);
 
                         var reply = doc.RootElement
-                            .GetProperty("candidates")[0]
+                            .GetProperty("choices")[0]
+                            .GetProperty("message")
                             .GetProperty("content")
-                            .GetProperty("parts")[0]
-                            .GetProperty("text")
                             .GetString();
 
                         return reply ?? "I'm sorry, I couldn't generate a response.";
@@ -208,7 +200,7 @@ namespace WineryOrderSystemAPI.Services
                 }
                 catch (TaskCanceledException)
                 {
-                    return "Error: Request to Gemini timed out after 30 seconds. Please check your network connection.";
+                    return "Error: Request to Grok timed out after 30 seconds. Please check your network connection.";
                 }
                 catch (Exception ex)
                 {
@@ -216,7 +208,7 @@ namespace WineryOrderSystemAPI.Services
                 }
             }
 
-            return $"Gemini API Error: {lastRawError}";
+            return $"Grok API Error: {lastRawError}";
         }
     }
 }

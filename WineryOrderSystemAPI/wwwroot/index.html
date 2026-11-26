@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oak Vine Cellar — Winery Order System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/store.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <!-- CUSTOMER UPPER-RIGHT WOODEN SIGNBOARD NAVBAR WITH HANGING VINES -->
+  <!-- CUSTOMER UPPER-RIGHT SEPARATE HANGING WOODEN PLAQUES NAVBAR -->
+  <header id="storeNavbar" class="store-navbar hidden">
+    <div class="nav-shell">
+      <!-- Left: Transparent Brand Logo -->
+      <button class="brand-logo-btn" data-route="home" type="button" aria-label="Oak Vine Cellar Home">
+        <img src="images/logo.png" alt="Oak Vine Cellar" class="brand-logo-img" />
+      </button>
+
+      <!-- Middle: Uncramped Search Bar -->
+      <div class="nav-center-search">
+        <div class="nav-quick-search">
+          <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="20" y1="20" x2="16.2" y2="16.2" />
+          </svg>
+          <input id="navQuickSearch" type="search" placeholder="Find vintage..." aria-label="Search wines" />
+        </div>
+      </div>
+
+      <!-- Right: Separate Hanging Wooden Plaques + Outside Basket & Profile Dropdown -->
+      <div class="nav-right-cluster">
+        <div class="wooden-board-wrap">
+          <!-- Desktop: Individual Hanging Wooden Plaques -->
+          <nav class="wooden-plaques-nav" aria-label="Main Navigation">
+            <button class="wooden-plaque nav-item" data-route="home" type="button">
+              <span class="plaque-cord left" aria-hidden="true"></span>
+              <span class="plaque-cord right" aria-hidden="true"></span>
+              <span class="plaque-rivet tl" aria-hidden="true"></span>
+              <span class="plaque-rivet tr" aria-hidden="true"></span>
+              <span class="plaque-rivet bl" aria-hidden="true"></span>
+              <span class="plaque-rivet br" aria-hidden="true"></span>
+              <span class="plaque-label">Home</span>
+            </button>
+
+            <button class="wooden-plaque nav-item" data-route="wines" type="button">
+              <span class="plaque-cord left" aria-hidden="true"></span>
+              <span class="plaque-cord right" aria-hidden="true"></span>
+              <span class="plaque-rivet tl" aria-hidden="true"></span>
+              <span class="plaque-rivet tr" aria-hidden="true"></span>
+              <span class="plaque-rivet bl" aria-hidden="true"></span>
+              <span class="plaque-rivet br" aria-hidden="true"></span>
+              <span class="plaque-label">Wines</span>
+              <!-- Trailing grapevine sprig hanging from Wines plaque -->
+              <svg class="plaque-vine-sprig" viewBox="0 0 44 38" fill="none" aria-hidden="true">
+                <path d="M22 0 C25 11, 14 19, 20 34" stroke="#486335" stroke-width="2" stroke-linecap="round"/>
+                <path d="M21 11 C12 9, 9 16, 17 19 Z" fill="#638449"/>
+                <path d="M19 21 C28 19, 30 26, 22 28 Z" fill="#4f6b3a"/>
+                <circle cx="15" cy="27" r="2.4" fill="#6e1d2d"/>
+                <circle cx="20" cy="30" r="2.4" fill="#49111C"/>
+                <circle cx="17" cy="33" r="2.1" fill="#7c2335"/>
+              </svg>
+            </button>
+
+            <button class="wooden-plaque nav-item" data-route="orders" type="button">
+              <span class="plaque-cord left" aria-hidden="true"></span>
+              <span class="plaque-cord right" aria-hidden="true"></span>
+              <span class="plaque-rivet tl" aria-hidden="true"></span>
+              <span class="plaque-rivet tr" aria-hidden="true"></span>
+              <span class="plaque-rivet bl" aria-hidden="true"></span>
+              <span class="plaque-rivet br" aria-hidden="true"></span>
+              <span class="plaque-label">Orders</span>
+            </button>
+          </nav>
+
+          <!-- Mobile: Compact Wooden Menu Plaque -->
+          <div class="nav-actions">
+            <button id="mobileMenuBtn" class="wooden-plaque mobile-menu-plaque" type="button" aria-label="Toggle Menu">
+              <span class="plaque-cord left" aria-hidden="true"></span>
+              <span class="plaque-cord right" aria-hidden="true"></span>
+              <span class="plaque-rivet tl" aria-hidden="true"></span>
+              <span class="plaque-rivet tr" aria-hidden="true"></span>
+              <span class="hamburger-lines" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Mobile Hanging Wooden Drawer -->
+          <div id="mobileNavDrawer" class="mobile-nav-drawer hidden">
+            <button class="mobile-nav-item" data-route="home" type="button">Home</button>
+            <button class="mobile-nav-item" data-route="wines" type="button">Wines Catalog</button>
+            <button class="mobile-nav-item" data-route="orders" type="button">My Orders</button>
+            <button class="mobile-nav-item" data-route="basket" type="button">Basket</button>
+            <button class="mobile-nav-item" data-route="profile" type="button">Edit Profile</button>
+            <button id="mobileAdminSwitch" class="mobile-nav-item hidden" data-route="admin-dashboard" type="button">Admin Dashboard</button>
+            <button id="mobileLogoutBtn" class="mobile-nav-item danger-text" type="button">Logout</button>
+          </div>
+        </div>
+
+        <!-- Outside Icon Actions: Basket & Profile Dropdown -->
+        <div class="nav-outside-actions">
+          <button class="nav-outside-icon" data-route="basket" type="button" aria-label="Basket" title="Basket">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            <span id="navBasketBadge" class="outside-icon-badge">0</span>
+          </button>
+
+          <div id="profileMenuWrap" class="profile-menu-wrap">
+            <button id="profileMenuBtn" class="nav-outside-icon" data-active-route="profile" type="button" aria-label="Profile Menu" aria-expanded="false" aria-haspopup="true" title="Profile">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </button>
+
+            <div id="profileDropdown" class="profile-dropdown hidden" role="menu">
+              <button class="profile-dropdown-item" data-route="profile" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span>Profile</span>
+              </button>
+              <button id="profileAdminSwitch" class="profile-dropdown-item hidden" data-route="admin-dashboard" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                </svg>
+                <span>Admin</span>
+              </button>
+              <button id="profileDropdownLogoutBtn" class="profile-dropdown-item danger" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAYMENT RETURN BANNER -->
+  <div id="paymentStatusBanner" class="payment-banner hidden"></div>
+
+  <!-- MAIN APPLICATION CONTAINER -->
+  <main id="appRoot">
+    <!-- ==================== AUTH: LOGIN ==================== -->
+    <section id="view-login" class="auth-screen hidden">
+      <div class="auth-watermark" aria-hidden="true">Winery</div>
+      <div class="auth-card animate-rise">
+        <p class="auth-brand-sub">OAK VINE CELLAR</p>
+        <h1 class="auth-title">LOGIN</h1>
+        <form id="loginForm" class="auth-form">
+          <label class="auth-field">
+            <span>EMAIL</span>
+            <input id="loginEmail" type="email" required autocomplete="email" placeholder="you@example.com" />
+          </label>
+          <label class="auth-field">
+            <span>PASSWORD</span>
+            <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Enter your password" />
+          </label>
+          <button id="loginSubmitBtn" type="submit" class="btn-sand full-width">LOGIN</button>
+        </form>
+        <p class="auth-switch">
+          NOT YET SIGNED UP?
+          <button type="button" class="text-link-light" data-route="signup">CLICK HERE</button>
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== AUTH: SIGN UP ==================== -->
+    <section id="view-signup" class="auth-screen hidden">
+      <div class="auth-watermark" aria-hidden="true">Winery</div>
+      <div class="auth-card auth-card-wide animate-rise">
+        <p class="auth-brand-sub">OAK VINE CELLAR</p>
+        <h1 class="auth-title">SIGN UP</h1>
+        <form id="signupForm" class="auth-form">
+          <div class="auth-grid-2">
+            <label class="auth-field">
+              <span>FULL NAME</span>
+              <input id="regFullName" type="text" required maxlength="100" placeholder="Juan Dela Cruz" />
+            </label>
+            <label class="auth-field">
+              <span>EMAIL</span>
+              <input id="regEmail" type="email" required maxlength="50" placeholder="you@example.com" />
+            </label>
+            <label class="auth-field">
+              <span>PHONE</span>
+              <input id="regPhone" type="tel" maxlength="13" placeholder="09XXXXXXXXX" />
+            </label>
+            <label class="auth-field">
+              <span>ADDRESS</span>
+              <input id="regAddress" type="text" maxlength="255" placeholder="City, Province" />
+            </label>
+            <label class="auth-field">
+              <span>PASSWORD</span>
+              <input id="regPassword" type="password" required minlength="6" placeholder="Min. 6 characters" />
+            </label>
+            <label class="auth-field">
+              <span>CONFIRM PASSWORD</span>
+              <input id="regConfirmPassword" type="password" required minlength="6" placeholder="Re-enter password" />
+            </label>
+          </div>
+          <button id="signupSubmitBtn" type="submit" class="btn-sand full-width">SIGN UP</button>
+        </form>
+        <p class="auth-switch">
+          ALREADY HAVE AN ACCOUNT?
+          <button type="button" class="text-link-light" data-route="login">BACK TO LOG IN</button>
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== USER: HOMEPAGE ==================== -->
+    <section id="view-home" class="store-view hidden">
+      <div class="hero-section">
+        <div class="hero-watermark" aria-hidden="true">Classic</div>
+        <div class="hero-inner">
+          <div class="hero-text-col animate-rise">
+            <span class="hero-eyebrow">ESTATE RESERVE COLLECTION</span>
+            <h1 class="hero-script-title">Classic <span>Wines</span></h1>
+            <p class="hero-subtitle">
+              Hand-selected vintages crafted for refined palates—from bold Napa Cabernets to crisp French Champagnes, archived in our cellar scrapbook.
+            </p>
+            <div class="hero-highlights" id="heroHighlights"></div>
+            <div class="hero-cta-row">
+              <button class="btn-crimson" data-route="wines" type="button">ALL WINES</button>
+              <button id="heroOpenChatBtn" class="btn-outline-dark" type="button">ASK SOMMELIER</button>
+            </div>
+          </div>
+          <div class="hero-bottle-col" aria-hidden="true">
+            <div class="hero-bottle-stage" id="heroBottleArt"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cellar-banner">
+        <h2>OAK VINE CELLAR</h2>
+        <p>CELLAR TASTING JOURNAL &bull; BEST SELLING VINTAGES</p>
+      </div>
+
+      <div class="page-container">
+        <div class="section-header-row">
+          <div>
+            <h3 class="serif-heading" style="font-size:1.75rem;">Best Selling Wines</h3>
+            <p class="muted-text">Pinned cellar favorites curated from our estate tasting ledger.</p>
+          </div>
+          <button class="btn-outline-dark btn-sm" data-route="wines" type="button">View Full Catalog &rarr;</button>
+        </div>
+        <div id="bestSellersGrid" class="scrapbook-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== USER: WINES CATALOG ==================== -->
+    <section id="view-wines" class="store-view hidden">
+      <div class="page-banner-compact">
+        <h1>Wines Catalog</h1>
+        <p>Browse our vintage cellar scrapbook with live stock availability.</p>
+      </div>
+
+      <div class="page-container">
+        <div class="filter-bar card-light">
+          <div class="filter-field grow">
+            <label for="catSearchInput">Search</label>
+            <input id="catSearchInput" type="search" placeholder="Search by wine name or notes..." />
+          </div>
+          <div class="filter-field">
+            <label for="catCategorySelect">Category</label>
+            <select id="catCategorySelect"><option value="All">All Categories</option></select>
+          </div>
+          <div class="filter-field small-num">
+            <label for="catMinPrice">Min Price (₱)</label>
+            <input id="catMinPrice" type="number" min="0" placeholder="0" />
+          </div>
+          <div class="filter-field small-num">
+            <label for="catMaxPrice">Max Price (₱)</label>
+            <input id="catMaxPrice" type="number" min="0" placeholder="Any" />
+          </div>
+          <div class="filter-field">
+            <label for="catAvailSelect">Availability</label>
+            <select id="catAvailSelect">
+              <option value="all">All Stock</option>
+              <option value="in">In Stock</option>
+              <option value="low">Low Stock (&lt;10)</option>
+              <option value="out">Out of Stock</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="catSortSelect">Sort By</label>
+            <select id="catSortSelect">
+              <option value="default">Featured</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="name-asc">Name: A–Z</option>
+            </select>
+          </div>
+          <button id="catResetBtn" class="btn-outline-dark btn-sm align-end" type="button">Reset</button>
+        </div>
+
+        <p id="catalogResultCount" class="muted-text mb-16"></p>
+        <div id="catalogGrid" class="scrapbook-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== USER: BASKET PAGE ==================== -->
+    <section id="view-basket" class="store-view hidden">
+      <div class="page-banner-compact">
+        <h1>Your Basket</h1>
+        <p>Review your selected bottles before proceeding to checkout.</p>
+      </div>
+
+      <div class="page-container">
+        <div class="two-col-layout">
+          <div id="basketItemsList" class="stack-16"></div>
+          <aside class="summary-card card-crimson">
+            <h2 class="serif-heading light-text">Order Summary</h2>
+            <div class="summary-line">
+              <span>Total Bottles</span>
+              <strong id="basketTotalItems">0</strong>
+            </div>
+            <div class="summary-line">
+              <span>Estimated Delivery</span>
+              <strong>Standard (2–4 days)</strong>
+            </div>
+            <hr class="divider-light" />
+            <div class="summary-line grand-total">
+              <span>Grand Total</span>
+              <strong id="basketGrandTotal">₱0.00</strong>
+            </div>
+            <button id="proceedCheckoutBtn" class="btn-sand full-width mt-16" type="button" disabled>
+              Proceed to Checkout
+            </button>
+            <button id="clearBasketBtn" class="btn-outline-light full-width mt-8 btn-sm" type="button">
+              Clear Basket
+            </button>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== USER: CHECKOUT PAGE ==================== -->
+    <section id="view-checkout" class="store-view hidden">
+      <div class="page-banner-compact">
+        <h1>Checkout</h1>
+        <p>Confirm your delivery details and select a payment method via Xendit.</p>
+      </div>
+
+      <div class="page-container">
+        <form id="checkoutForm" class="two-col-layout">
+          <div class="stack-20">
+            <div class="card-light">
+              <h2 class="serif-heading mb-12">1. Customer Contact &amp; Delivery</h2>
+              <div class="form-grid-2">
+                <label class="form-field">
+                  <span>Full Name</span>
+                  <input id="chkFullName" type="text" required />
+                </label>
+                <label class="form-field">
+                  <span>Email Address</span>
+                  <input id="chkEmail" type="email" required />
+                </label>
+                <label class="form-field">
+                  <span>Mobile Number</span>
+                  <input id="chkPhone" type="tel" required maxlength="13" placeholder="09XXXXXXXXX" />
+                </label>
+                <label class="form-field full-span">
+                  <span>Delivery Address</span>
+                  <textarea id="chkAddress" rows="2" required placeholder="House/Unit, Street, Barangay, City, Province"></textarea>
+                </label>
+              </div>
+            </div>
+
+            <div class="card-light">
+              <h2 class="serif-heading mb-12">2. Payment Method</h2>
+              <p class="muted-text mb-12">All channels are securely processed through Xendit Hosted Invoice.</p>
+              <div id="paymentMethodsGrid" class="payment-methods-grid">
+                <label class="payment-option selected">
+                  <input type="radio" name="paymentMethod" value="GCASH" checked />
+                  <div>
+                    <strong>GCash</strong>
+                    <small>E-Wallet &bull; Instant QR / MPIN verification</small>
+                  </div>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="paymentMethod" value="MAYA" />
+                  <div>
+                    <strong>Maya</strong>
+                    <small>E-Wallet &bull; Mobile number &amp; OTP checkout</small>
+                  </div>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="paymentMethod" value="CARD" />
+                  <div>
+                    <strong>Visa / Mastercard</strong>
+                    <small>Credit or Debit Card &bull; 3DS Secure</small>
+                  </div>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="paymentMethod" value="BPI" />
+                  <div>
+                    <strong>BPI Direct Debit</strong>
+                    <small>Online Banking &bull; BPI Account Login</small>
+                  </div>
+                </label>
+                <label class="payment-option">
+                  <input type="radio" name="paymentMethod" value="UNIONBANK" />
+                  <div>
+                    <strong>UnionBank Online</strong>
+                    <small>Online Banking &bull; Instant Fund Transfer</small>
+                  </div>
+                </label>
+              </div>
+              <div id="paymentChannelDetails" class="channel-info-box mt-12"></div>
+            </div>
+          </div>
+
+          <aside class="summary-card card-crimson">
+            <h2 class="serif-heading light-text">Order Summary</h2>
+            <div id="checkoutSummaryItems" class="checkout-items-list"></div>
+            <hr class="divider-light" />
+            <div class="summary-line grand-total">
+              <span>Grand Total</span>
+              <strong id="checkoutGrandTotal">₱0.00</strong>
+            </div>
+            <button id="placeOrderPayBtn" class="btn-sand full-width mt-16" type="submit">
+              Proceed to Payment (Xendit)
+            </button>
+            <button class="btn-outline-light full-width mt-8 btn-sm" data-route="basket" type="button">
+              &larr; Back to Basket
+            </button>
+          </aside>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== USER: ORDERS PAGE ==================== -->
+    <section id="view-orders" class="store-view hidden">
+      <div class="page-banner-compact">
+        <h1>My Orders</h1>
+        <p>Track your purchases, inspect itemized receipts, or cancel pending orders.</p>
+      </div>
+
+      <div class="page-container">
+        <div class="card-light table-card">
+          <div class="table-header-bar">
+            <h2 class="serif-heading">Order History</h2>
+            <button id="refreshUserOrdersBtn" class="btn-outline-dark btn-sm" type="button">Refresh</button>
+          </div>
+          <div class="table-responsive table-scroll-cap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Order Date</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="userOrdersTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== USER: EDIT PROFILE PAGE ==================== -->
+    <section id="view-profile" class="store-view hidden">
+      <div class="page-banner-compact">
+        <h1>Edit Profile</h1>
+        <p>Manage your contact details and default delivery address.</p>
+      </div>
+
+      <div class="page-container narrow-container">
+        <div class="card-light">
+          <form id="profileForm" class="stack-16">
+            <div class="form-grid-2">
+              <label class="form-field">
+                <span>Email Address (Read-Only)</span>
+                <input id="profEmail" type="email" readonly class="readonly-input" />
+              </label>
+              <label class="form-field">
+                <span>Account Role (Read-Only)</span>
+                <input id="profRole" type="text" readonly class="readonly-input" />
+              </label>
+            </div>
+            <label class="form-field">
+              <span>Full Name</span>
+              <input id="profFullName" type="text" required maxlength="100" />
+            </label>
+            <label class="form-field">
+              <span>Mobile Number</span>
+              <input id="profPhone" type="tel" maxlength="13" placeholder="09XXXXXXXXX" />
+            </label>
+            <label class="form-field">
+              <span>Delivery Address</span>
+              <textarea id="profAddress" rows="3" maxlength="255"></textarea>
+            </label>
+            <div class="form-actions-end">
+              <button type="submit" class="btn-crimson">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ADMIN SHELL (FIGMA BENTO SETUP) ==================== -->
+    <section id="view-admin" class="admin-shell hidden">
+      <div id="adminMobileBar" class="admin-mobile-bar">
+        <button id="adminSidebarToggle" class="btn-crimson btn-sm" type="button">☰ Winery</button>
+        <span class="serif-heading">Admin Cellar</span>
+        <button id="adminMobileLogout" class="btn-outline-dark btn-sm" type="button">Logout</button>
+      </div>
+
+      <!-- LEFT COLUMN (Matches Figma Winery Nav + 2 Crimson Stat Tiles) -->
+      <aside id="adminSidebar" class="admin-sidebar">
+        <div class="admin-nav-card">
+          <div class="admin-brand-head">
+            <h2>Winery</h2>
+          </div>
+          <hr class="admin-nav-divider" />
+          <nav class="admin-nav-list">
+            <button class="admin-nav-btn active" data-route="admin-dashboard" type="button">
+              <span class="bottle-bullet" aria-hidden="true">
+                <svg viewBox="0 0 16 32" width="12" height="22"><rect x="6" y="1" width="4" height="6" rx="1" fill="currentColor"/><path d="M6 7 C3 9 3 12 3 15 L3 30 C3 31 4 31 5 31 L11 31 C12 31 13 31 13 30 L13 15 C13 12 13 9 10 7 Z" fill="currentColor"/><rect x="4.5" y="16" width="7" height="7" rx="0.5" fill="#49111C"/></svg>
+              </span>
+              <span class="nav-label">Dashboard</span>
+              <span class="active-arrow" aria-hidden="true"></span>
+            </button>
+            <button class="admin-nav-btn" data-route="admin-inventory" type="button">
+              <span class="bottle-bullet" aria-hidden="true">
+                <svg viewBox="0 0 16 32" width="12" height="22"><rect x="6" y="1" width="4" height="6" rx="1" fill="currentColor"/><path d="M6 7 C3 9 3 12 3 15 L3 30 C3 31 4 31 5 31 L11 31 C12 31 13 31 13 30 L13 15 C13 12 13 9 10 7 Z" fill="currentColor"/><rect x="4.5" y="16" width="7" height="7" rx="0.5" fill="#49111C"/></svg>
+              </span>
+              <span class="nav-label">Inventory</span>
+              <span class="active-arrow" aria-hidden="true"></span>
+            </button>
+            <button class="admin-nav-btn" data-route="admin-orders" type="button">
+              <span class="bottle-bullet" aria-hidden="true">
+                <svg viewBox="0 0 16 32" width="12" height="22"><rect x="6" y="1" width="4" height="6" rx="1" fill="currentColor"/><path d="M6 7 C3 9 3 12 3 15 L3 30 C3 31 4 31 5 31 L11 31 C12 31 13 31 13 30 L13 15 C13 12 13 9 10 7 Z" fill="currentColor"/><rect x="4.5" y="16" width="7" height="7" rx="0.5" fill="#49111C"/></svg>
+              </span>
+              <span class="nav-label">Order Management</span>
+              <span class="active-arrow" aria-hidden="true"></span>
+            </button>
+          </nav>
+
+          <div class="admin-nav-footer">
+            <button class="admin-sub-btn" data-route="home" type="button">Storefront View</button>
+            <button id="adminLogoutBtn" class="admin-sub-btn" type="button">Logout</button>
+          </div>
+        </div>
+
+        <!-- Side Tile 1: Total Wine Products (always shown, matching Figma) -->
+        <div class="figma-tile side-tile" data-route="admin-inventory">
+          <div class="tile-top">
+            <span class="tile-title">Total Wine Products</span>
+          </div>
+          <div class="tile-body-row">
+            <svg class="engraved-icon" viewBox="0 0 64 64" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="M22 8h6v10l4 6v30a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V24l4-6V8z"/>
+              <rect x="20" y="30" width="10" height="12"/>
+              <path d="M40 24h12l-1 10a5 5 0 0 1-5 5 5 5 0 0 1-5-5l-1-10z"/>
+              <line x1="46" y1="39" x2="46" y2="54"/>
+              <line x1="40" y1="54" x2="52" y2="54"/>
+            </svg>
+            <strong id="sideTotalWines" class="tile-num">0</strong>
+          </div>
+        </div>
+
+        <!-- Side Tile 2A: Total Orders (Dashboard & Orders view, aligns with bottom Figma row) -->
+        <div id="sideTileTotalOrders" class="figma-tile side-tile" data-route="admin-orders">
+          <div class="tile-top">
+            <span class="tile-title">Total Orders</span>
+          </div>
+          <div class="tile-body-row">
+            <svg class="engraved-icon" viewBox="0 0 64 64" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="12" y="10" width="40" height="44" rx="3"/>
+              <line x1="20" y1="22" x2="44" y2="22"/>
+              <line x1="20" y1="32" x2="44" y2="32"/>
+              <line x1="20" y1="42" x2="36" y2="42"/>
+            </svg>
+            <strong id="sideTotalOrders" class="tile-num">0</strong>
+          </div>
+        </div>
+
+        <!-- Side Tile 2B: Low-Stock Alerts (Shown on Inventory view to match Figma bottom frame) -->
+        <div id="sideTileLowStock" class="figma-tile side-tile hidden" data-route="admin-inventory">
+          <div class="tile-top">
+            <span class="tile-title">Low-Stock Alerts</span>
+          </div>
+          <div class="tile-body-row">
+            <svg class="engraved-icon" viewBox="0 0 64 64" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <polygon points="32,10 54,21 54,45 32,56 10,45 10,21"/>
+              <polyline points="10,21 32,32 54,21"/>
+              <line x1="32" y1="32" x2="32" y2="56"/>
+              <line x1="8" y1="10" x2="8" y2="22" stroke-width="2.4"/>
+              <circle cx="8" cy="27" r="1.5" fill="currentColor"/>
+            </svg>
+            <strong id="sideLowStock" class="tile-num">0</strong>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT MAIN WORKSPACE -->
+      <div class="admin-main">
+        <!-- ==================== ADMIN: DASHBOARD OVERVIEW ==================== -->
+        <div id="admin-tab-dashboard" class="admin-tab">
+          <div class="admin-page-head">
+            <div>
+              <h1>Dashboard Overview</h1>
+              <p>Shop Overview &bull; Live Cellar &amp; Warehouse Ledger</p>
+            </div>
+            <span class="admin-corner-brand">Winery</span>
+          </div>
+
+          <!-- FIGMA MAIN ROW: Pending Orders (Left Tall) + Inventory Summary / Themed Analytics (Right Wide) -->
+          <div class="figma-mid-grid">
+            <div id="kpiPendingCard" class="figma-tile tall-tile clickable-tile">
+              <div class="tile-header-split">
+                <div>
+                  <span class="tile-title">Pending Orders</span>
+                  <small class="tile-sub">Click to manage queue &rarr;</small>
+                </div>
+                <strong id="kpiPendingOrders" class="tile-num-lg">0</strong>
+              </div>
+              <div id="pendingOrdersMiniList" class="tile-scroll-feed"></div>
+            </div>
+
+            <div class="figma-tile wide-tile">
+              <div class="tile-header-split">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <svg class="engraved-icon" viewBox="0 0 64 64" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <polygon points="32,8 56,20 56,44 32,56 8,44 8,20"/>
+                    <polyline points="8,20 32,32 56,20"/>
+                    <line x1="32" y1="32" x2="32" y2="56"/>
+                  </svg>
+                  <div>
+                    <span class="tile-title">Inventory Summary &amp; Analytics</span>
+                    <small class="tile-sub" id="chartActiveSubtitle">Cellar Stock Breakdown by Category</small>
+                  </div>
+                </div>
+                <div class="chart-toggle-group">
+                  <button class="chart-tab-btn active" data-chart-mode="stock" type="button">Stock</button>
+                  <button class="chart-tab-btn" data-chart-mode="sales" type="button">OLAP Sales</button>
+                </div>
+              </div>
+              <div class="crimson-chart-wrap">
+                <canvas id="wineryAnalyticsChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- FIGMA BOTTOM ROW (3 Cards aligned with Total Orders on the left = 4-column base) -->
+          <div class="figma-bottom-grid">
+            <!-- Completed Orders -->
+            <div class="figma-tile bottom-tile">
+              <div class="tile-header-split">
+                <span class="tile-title">Completed Orders</span>
+                <strong id="kpiCompletedOrders" class="tile-num">0</strong>
+              </div>
+              <div class="tile-stat-detail">
+                <small class="tile-sub">Fulfilled Revenue</small>
+                <span id="kpiCompletedRevenue" class="tile-money">₱0.00</span>
+              </div>
+            </div>
+
+            <!-- Recent Orders (Compact Scrollable Feed — solves page stretching) -->
+            <div class="figma-tile bottom-tile">
+              <div class="tile-header-split">
+                <span class="tile-title">Recent Orders</span>
+                <button class="btn-sand btn-xs" data-route="admin-orders" type="button">All</button>
+              </div>
+              <div id="adminRecentOrdersFeed" class="tile-scroll-feed compact-feed"></div>
+            </div>
+
+            <!-- Low-Stock Alerts -->
+            <div class="figma-tile bottom-tile">
+              <div class="tile-header-split">
+                <span class="tile-title">Low-Stock Alerts</span>
+                <span id="kpiLowStockBadge" class="pill-sand">0</span>
+              </div>
+              <div id="lowStockList" class="tile-scroll-feed compact-feed"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== ADMIN: INVENTORY MANAGEMENT ==================== -->
+        <div id="admin-tab-inventory" class="admin-tab hidden">
+          <div class="admin-page-head">
+            <div>
+              <h1>Inventory Management</h1>
+              <p>Manage Wine Products</p>
+            </div>
+            <span class="admin-corner-brand">Winery</span>
+          </div>
+
+          <div class="admin-toolbar-row">
+            <input id="invSearchInput" class="admin-search-input" type="search" placeholder="Search wine name..." />
+            <select id="invCategoryFilter" class="admin-select-input"><option value="All">All Categories</option></select>
+            <button id="openAddWineModalBtn" class="btn-crimson" type="button">+ Add Wine</button>
+          </div>
+
+          <!-- Crimson-framed scrollable ledger matching Figma -->
+          <div class="crimson-ledger-panel">
+            <div class="table-responsive ledger-scroll">
+              <table class="ledger-table">
+                <thead>
+                  <tr>
+                    <th>Bottle</th>
+                    <th>Wine Name &amp; Notes</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminInventoryTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== ADMIN: ORDER MANAGEMENT ==================== -->
+        <div id="admin-tab-orders" class="admin-tab hidden">
+          <div class="admin-page-head">
+            <div>
+              <h1>Order Management</h1>
+              <p>Review deliveries and advance order statuses</p>
+            </div>
+            <span class="admin-corner-brand">Winery</span>
+          </div>
+
+          <div class="admin-toolbar-row">
+            <input id="ordSearchInput" class="admin-search-input" type="search" placeholder="Search Order ID or Customer..." />
+            <select id="ordStatusFilter" class="admin-select-input">
+              <option value="All">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="PendingPayment">Pending Payment</option>
+              <option value="Processing">Processing</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+            <button id="adminRefreshOrdersBtn" class="btn-outline-dark btn-sm" type="button">Refresh</button>
+          </div>
+
+          <div class="crimson-ledger-panel">
+            <div class="table-responsive ledger-scroll">
+              <table class="ledger-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Ordered Products</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminOrdersTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+  <div id="wineDetailModal" class="modal-overlay hidden">
+    <div class="modal-box modal-wine">
+      <button class="modal-close-btn" data-close-modal="wineDetailModal" type="button">&times;</button>
+      <div id="wineDetailBody"></div>
+    </div>
+  </div>
+
+  <div id="orderDetailModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <button class="modal-close-btn" data-close-modal="orderDetailModal" type="button">&times;</button>
+      <div id="orderDetailBody"></div>
+    </div>
+  </div>
+
+  <div id="adminWineModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <button class="modal-close-btn" data-close-modal="adminWineModal" type="button">&times;</button>
+      <h2 id="adminWineModalTitle" class="serif-heading mb-16">Add New Wine</h2>
+      <form id="adminWineForm" class="stack-12">
+        <label class="form-field">
+          <span>Wine Name</span>
+          <input id="awName" type="text" required maxlength="100" />
+        </label>
+        <div class="form-grid-2">
+          <label class="form-field">
+            <span>Category</span>
+            <input id="awCategory" type="text" required placeholder="Red Wine, White Wine..." />
+          </label>
+          <label class="form-field">
+            <span>Price (₱)</span>
+            <input id="awPrice" type="number" step="0.01" min="0" required />
+          </label>
+        </div>
+        <div class="form-grid-2">
+          <label class="form-field">
+            <span>Stock Quantity</span>
+            <input id="awStock" type="number" min="0" required />
+          </label>
+          <label class="form-field">
+            <span>Image URL (Optional Preview)</span>
+            <input id="awImageUrl" type="url" placeholder="https://..." />
+          </label>
+        </div>
+        <label class="form-field">
+          <span>Description</span>
+          <textarea id="awDesc" rows="3" maxlength="500"></textarea>
+        </label>
+        <div class="form-actions-end mt-8">
+          <button class="btn-outline-dark" data-close-modal="adminWineModal" type="button">Cancel</button>
+          <button type="submit" class="btn-crimson">Save Wine</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== FLOATING AI SOMMELIER CHATBOT ==================== -->
+  <div id="chatbotRoot" class="hidden">
+    <button id="chatFab" class="chat-fab" type="button" aria-label="Open AI Sommelier">
+      <span>🍷</span> Sommelier
+    </button>
+
+    <section id="chatWidget" class="chat-widget hidden" aria-label="AI Sommelier Chatbot">
+      <div class="chat-header">
+        <div>
+          <strong>Oak Vine Sommelier</strong>
+          <small>Cellar Assistant</small>
+        </div>
+        <div class="chat-header-controls">
+          <select id="chatSessionSelect" aria-label="Chat sessions"></select>
+          <button id="chatNewBtn" class="btn-sand btn-xs" type="button">New</button>
+          <button id="chatCloseBtn" class="chat-close" type="button">&times;</button>
+        </div>
+      </div>
+      <div id="chatQuickPrompts" class="chat-prompts"></div>
+      <div id="chatMessages" class="chat-feed"></div>
+      <form id="chatForm" class="chat-input-form">
+        <input id="chatInput" type="text" placeholder="Ask about wines, prices, or stock..." autocomplete="off" />
+        <button id="chatSendBtn" class="btn-crimson btn-sm" type="submit">Send</button>
+      </form>
+    </section>
+  </div>
+
+  <div id="toastRoot" class="toast-root"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
